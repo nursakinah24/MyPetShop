@@ -4,6 +4,7 @@ import { Product } from "../entity/product.entity.";
 import { FilterProductDto } from "../dto/filter-product.dto";
 import { CreateProductDto } from "../dto/create-product.dto";
 import { InternalServerErrorException } from "@nestjs/common";
+import { User } from "src/users/entity/user.entity";
 
 @CustomRepository(Product)
 export class ProductRepository extends Repository<Product>{
@@ -11,6 +12,7 @@ export class ProductRepository extends Repository<Product>{
         const { prodName, prodDesc, min_prodPrice, max_prodPrice} = filter;
 
         const query = this.createQueryBuilder('product');
+        //.where('product.userId = :userId', { userId: user.id});
 
         if (prodName) {
             query.andWhere('lower(product.prodName) LIKE :prodName', {prodName: '%${prodName.toLowerCase()}%',
@@ -29,13 +31,14 @@ export class ProductRepository extends Repository<Product>{
         return await query.getMany();
     }
 
-    async createProduct(createProductDto: CreateProductDto): Promise<void> {
+    async createProduct(user: User, createProductDto: CreateProductDto): Promise<void> {
         const { prodName, prodDesc, prodPrice } = createProductDto;
 
         const product = this.create();
         product.prodName = prodName;
         product.prodDesc = prodDesc;
         product.prodPrice = prodPrice;
+        product.user = user;
 
         try{
             await product.save();

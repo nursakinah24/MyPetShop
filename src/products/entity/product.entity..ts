@@ -1,4 +1,5 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/users/entity/user.entity";
+import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Product extends BaseEntity {
@@ -13,4 +14,7 @@ export class Product extends BaseEntity {
 
     @Column()
     prodPrice: number;
+  
+    @ManyToOne(() => User, (user) => user.products)
+    user: User;
 }
